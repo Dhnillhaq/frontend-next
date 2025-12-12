@@ -1,65 +1,191 @@
-import Image from "next/image";
+import { fetchOperations } from "@/services/operationService";
+import DashboardCharts from "./components/DashboardCharts";
 
-export default function Home() {
+export default async function DashboardPage() {
+  const operations = await fetchOperations();
+
+  // Filter operasi hari ini
+  const today = new Date().toISOString().split('T')[0];
+  const todayOperations = operations.filter(op => {
+    const opDate = new Date(op.operationDate).toISOString().split('T')[0];
+    return opDate === today;
+  });
+
+  // Hitung statistik
+  const totalToday = todayOperations.length;
+  const qualityOK = todayOperations.filter(op => op.quality === 'OK').length;
+  const qualityRate = totalToday > 0 ? ((qualityOK / totalToday) * 100).toFixed(1) : 0;
+  
+  const avgTemp = totalToday > 0 
+    ? (todayOperations.reduce((sum, op) => sum + op.temperature, 0) / totalToday).toFixed(1)
+    : 0;
+  
+  const avgWeight = totalToday > 0
+    ? (todayOperations.reduce((sum, op) => sum + op.weight, 0) / totalToday).toFixed(2)
+    : 0;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="groups-container">
+      <h1 className="groups-title">Dashboard Produksi</h1>
+      <p className="groups-subtitle">Ringkasan data operasi produksi hari ini</p>
+
+      {/* Summary Cards */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+        gap: '1rem',
+        marginBottom: '2rem'
+      }}>
+        {/* Total Produksi */}
+        <div style={{
+          background: 'linear-gradient(135deg, #10b981 0%, #036143 100%)',
+          padding: '1.5rem',
+          borderRadius: '12px',
+          color: 'white',
+          boxShadow: '0 4px 6px rgba(5, 150, 105, 0.2)'
+        }}>
+          <div style={{ fontSize: '0.875rem', opacity: 0.9, marginBottom: '0.5rem' }}>
+            Total Produksi Hari Ini
+          </div>
+          <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
+            {totalToday}
+          </div>
+          <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>
+            operasi tercatat
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Quality Rate */}
+        <div style={{
+          background: 'linear-gradient(135deg, #34d399 0%, #10b981 100%)',
+          padding: '1.5rem',
+          borderRadius: '12px',
+          color: 'white',
+          boxShadow: '0 4px 6px rgba(16, 185, 129, 0.2)'
+        }}>
+          <div style={{ fontSize: '0.875rem', opacity: 0.9, marginBottom: '0.5rem' }}>
+            Quality Rate
+          </div>
+          <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
+            {qualityRate}%
+          </div>
+          <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>
+            {qualityOK} OK dari {totalToday} total
+          </div>
         </div>
-      </main>
+
+        {/* Rata-rata Suhu */}
+        <div style={{
+          background: 'linear-gradient(135deg, #6ee7b7 0%, #34d399 100%)',
+          padding: '1.5rem',
+          borderRadius: '12px',
+          color: 'white',
+          boxShadow: '0 4px 6px rgba(52, 211, 153, 0.2)'
+        }}>
+          <div style={{ fontSize: '0.875rem', opacity: 0.9, marginBottom: '0.5rem' }}>
+            Rata-rata Suhu
+          </div>
+          <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
+            {avgTemp}°C
+          </div>
+          <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>
+            temperatur produksi
+          </div>
+        </div>
+
+        {/* Rata-rata Berat */}
+        <div style={{
+          background: 'linear-gradient(135deg, #036143 0%, #047857 100%)',
+          padding: '1.5rem',
+          borderRadius: '12px',
+          color: 'white',
+          boxShadow: '0 4px 6px rgba(4, 120, 87, 0.2)'
+        }}>
+          <div style={{ fontSize: '0.875rem', opacity: 0.9, marginBottom: '0.5rem' }}>
+            Rata-rata Berat
+          </div>
+          <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
+            {avgWeight}
+          </div>
+          <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>
+            kg per operasi
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <DashboardCharts operations={operations} />
+
+      {/* Recent Operations */}
+      <div style={{
+        background: 'white',
+        padding: '1.5rem',
+        borderRadius: '12px',
+        border: '1px solid #e5e7eb',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+      }}>
+        <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>
+          Operasi Terbaru Hari Ini
+        </h3>
+        {todayOperations.length === 0 ? (
+          <div style={{ color: '#6b7280', fontSize: '0.875rem', textAlign: 'center', padding: '2rem' }}>
+            Belum ada operasi hari ini
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table className="groups-table">
+              <thead>
+                <tr>
+                  <th>Group</th>
+                  <th>Shift</th>
+                  <th>Line</th>
+                  <th>Suhu</th>
+                  <th>Berat</th>
+                  <th>Kualitas</th>
+                  <th>Input</th>
+                </tr>
+              </thead>
+              <tbody>
+                {todayOperations.slice(0, 10).map((op) => (
+                  <tr key={op.id}>
+                    <td>{op.group?.name || '-'}</td>
+                    <td>Shift {op.shift?.shiftNumber || '-'}</td>
+                    <td>{op.productionLine?.lineCode || '-'}</td>
+                    <td>{op.temperature}°C</td>
+                    <td>{op.weight} kg</td>
+                    <td>
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '0.25rem 0.5rem',
+                        borderRadius: '0.25rem',
+                        fontSize: '0.75rem',
+                        fontWeight: '600',
+                        backgroundColor: op.quality === 'OK' ? '#10b981' : '#ef4444',
+                        color: 'white'
+                      }}>
+                        {op.quality}
+                      </span>
+                    </td>
+                    <td>
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '0.25rem 0.5rem',
+                        borderRadius: '0.25rem',
+                        fontSize: '0.75rem',
+                        fontWeight: '600',
+                        backgroundColor: op.inputMethod === 'MANUAL' ? '#3b82f6' : '#a855f7',
+                        color: 'white'
+                      }}>
+                        {op.inputMethod}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
