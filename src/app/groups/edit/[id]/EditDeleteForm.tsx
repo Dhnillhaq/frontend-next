@@ -36,50 +36,65 @@ export default function EditGroupForm({ group }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
-      <div
-        style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}
-      >
-        <input
-          type="text"
-          placeholder="Nama"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
+    <div>
+      {/* Status Badge */}
+      <div style={{ marginBottom: 16 }}>
+        <span
           style={{
-            flex: 1,
-            minWidth: 150,
-          }}
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            whiteSpace: "nowrap",
-          }}
-        >
-          {loading ? "Updating..." : "Update"}
-        </button>
-        <button
-          type="button"
-          onClick={() => router.push("/groups")}
-          style={{
-            whiteSpace: "nowrap",
-            border: "1px solid #4b5563",
-            background: "transparent",
+            display: "inline-block",
+            padding: "0.5rem 1rem",
+            borderRadius: "0.375rem",
+            fontSize: "0.875rem",
+            fontWeight: "600",
+            backgroundColor: group.isActive ? "#22c55e" : "#6b7280",
             color: "white",
-            fontWeight: 600,
-            cursor: "pointer",
-            whiteSpace: "nowrap",
           }}
         >
-          Batal
-        </button>
+          Status: {group.isActive ? "Aktif" : "Nonaktif"}
+        </span>
       </div>
 
-      {error && (
-        <p style={{ color: "#f97373", fontSize: "0.85rem" }}>{error}</p>
-      )}
-    </form>
+      <form onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
+        <div
+          style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}
+        >
+          <input
+            type="text"
+            placeholder="Nama"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            style={{
+              flex: 1,
+              minWidth: 150,
+            }}
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              whiteSpace: "nowrap",
+            }}
+          >
+            {loading ? "Updating..." : "Update"}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/groups")}
+            style={{
+              whiteSpace: "nowrap",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            Batal
+          </button>
+        </div>
+
+        {error && (
+          <p style={{ color: "#f97373", fontSize: "0.85rem" }}>{error}</p>
+        )}
+      </form>
+    </div>
   );
 }
