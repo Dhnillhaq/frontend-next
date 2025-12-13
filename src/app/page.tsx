@@ -4,30 +4,23 @@ import DashboardCharts from "./components/DashboardCharts";
 export default async function DashboardPage() {
   const operations = await fetchOperations();
 
-  // Filter operasi hari ini
-  const today = new Date().toISOString().split('T')[0];
-  const todayOperations = operations.filter(op => {
-    const opDate = new Date(op.operationDate).toISOString().split('T')[0];
-    return opDate === today;
-  });
-
-  // Hitung statistik
-  const totalToday = todayOperations.length;
-  const qualityOK = todayOperations.filter(op => op.quality === 'OK').length;
-  const qualityRate = totalToday > 0 ? ((qualityOK / totalToday) * 100).toFixed(1) : 0;
+  // Hitung statistik untuk seluruh data
+  const total = operations.length;
+  const qualityOK = operations.filter(op => op.quality === 'OK').length;
+  const qualityRate = total > 0 ? ((qualityOK / total) * 100).toFixed(1) : 0;
   
-  const avgTemp = totalToday > 0 
-    ? (todayOperations.reduce((sum, op) => sum + op.temperature, 0) / totalToday).toFixed(1)
+  const avgTemp = total > 0 
+    ? (operations.reduce((sum, op) => sum + op.temperature, 0) / total).toFixed(1)
     : 0;
   
-  const avgWeight = totalToday > 0
-    ? (todayOperations.reduce((sum, op) => sum + op.weight, 0) / totalToday).toFixed(2)
+  const avgWeight = total > 0
+    ? (operations.reduce((sum, op) => sum + op.weight, 0) / total).toFixed(2)
     : 0;
 
   return (
     <div className="groups-container">
       <h1 className="groups-title">Dashboard Produksi</h1>
-      <p className="groups-subtitle">Ringkasan data operasi produksi hari ini</p>
+      <p className="groups-subtitle">Ringkasan data operasi produksi keseluruhan</p>
 
       {/* Summary Cards */}
       <div style={{ 
@@ -45,10 +38,10 @@ export default async function DashboardPage() {
           boxShadow: '0 4px 6px rgba(5, 150, 105, 0.2)'
         }}>
           <div style={{ fontSize: '0.875rem', opacity: 0.9, marginBottom: '0.5rem' }}>
-            Total Produksi Hari Ini
+            Total Produksi
           </div>
           <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
-            {totalToday}
+            {total}
           </div>
           <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>
             operasi tercatat
@@ -70,7 +63,7 @@ export default async function DashboardPage() {
             {qualityRate}%
           </div>
           <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>
-            {qualityOK} OK dari {totalToday} total
+            {qualityOK} OK dari {total} total
           </div>
         </div>
 
@@ -125,11 +118,11 @@ export default async function DashboardPage() {
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
       }}>
         <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>
-          Operasi Terbaru Hari Ini
+          10 Operasi Terbaru
         </h3>
-        {todayOperations.length === 0 ? (
+        {operations.length === 0 ? (
           <div style={{ color: '#6b7280', fontSize: '0.875rem', textAlign: 'center', padding: '2rem' }}>
-            Belum ada operasi hari ini
+            Belum ada data operasi
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
@@ -146,7 +139,7 @@ export default async function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {todayOperations.slice(0, 10).map((op) => (
+                {operations.slice(0, 10).map((op) => (
                   <tr key={op.id}>
                     <td>{op.group?.name || '-'}</td>
                     <td>Shift {op.shift?.shiftNumber || '-'}</td>

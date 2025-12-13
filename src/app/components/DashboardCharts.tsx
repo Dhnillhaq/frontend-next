@@ -32,27 +32,20 @@ const COLORS = {
 };
 
 export default function DashboardCharts({ operations }: DashboardChartsProps) {
-  // Filter operasi hari ini
-  const today = new Date().toISOString().split('T')[0];
-  const todayOperations = operations.filter(op => {
-    const opDate = new Date(op.operationDate).toISOString().split('T')[0];
-    return opDate === today;
-  });
-
   // Data untuk Quality Rate Pie Chart
   const qualityData = [
-    { name: 'OK', value: todayOperations.filter(op => op.quality === 'OK').length, color: COLORS.ok },
-    { name: 'NOT OK', value: todayOperations.filter(op => op.quality === 'NOT_OK').length, color: COLORS.notOk }
+    { name: 'OK', value: operations.filter(op => op.quality === 'OK').length, color: COLORS.ok },
+    { name: 'NOT OK', value: operations.filter(op => op.quality === 'NOT_OK').length, color: COLORS.notOk }
   ];
 
   // Data untuk Input Method Pie Chart
   const inputMethodData = [
-    { name: 'MANUAL', value: todayOperations.filter(op => op.inputMethod === 'MANUAL').length, color: COLORS.manual },
-    { name: 'OCR', value: todayOperations.filter(op => op.inputMethod === 'OCR').length, color: COLORS.ocr }
+    { name: 'MANUAL', value: operations.filter(op => op.inputMethod === 'MANUAL').length, color: COLORS.manual },
+    { name: 'OCR', value: operations.filter(op => op.inputMethod === 'OCR').length, color: COLORS.ocr }
   ];
 
   // Data untuk Produksi per Shift Bar Chart
-  const shiftStats = todayOperations.reduce((acc, op) => {
+  const shiftStats = operations.reduce((acc, op) => {
     if (!op.shift) return acc;
     const shiftNum = op.shift.shiftNumber;
     if (!acc[shiftNum]) {
@@ -73,15 +66,15 @@ export default function DashboardCharts({ operations }: DashboardChartsProps) {
     return shiftA - shiftB;
   });
 
-  // Data untuk Temperature & Weight Trend (last 10 operations)
-  const trendData = todayOperations.slice(-10).map((op, index) => ({
+  // Data untuk Temperature & Weight Trend (last 20 operations)
+  const trendData = operations.slice(-20).map((op, index) => ({
     index: `#${index + 1}`,
     temperature: op.temperature,
     weight: op.weight,
   }));
 
   // Data untuk Produksi per Group
-  const groupStats = todayOperations.reduce((acc, op) => {
+  const groupStats = operations.reduce((acc, op) => {
     if (!op.group) return acc;
     const groupName = op.group.name;
     if (!acc[groupName]) {
@@ -179,6 +172,11 @@ export default function DashboardCharts({ operations }: DashboardChartsProps) {
       </div>
 
       {/* Row 2: Shift Production Bar Chart */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+        gap: '1.5rem'
+      }}>
       <div style={{
         background: 'white',
         padding: '1.5rem',
@@ -231,6 +229,7 @@ export default function DashboardCharts({ operations }: DashboardChartsProps) {
           </ResponsiveContainer>
         </div>
       )}
+      </div>
 
       {/* Row 4: Temperature & Weight Trend */}
       {trendData.length > 0 && (
@@ -242,7 +241,7 @@ export default function DashboardCharts({ operations }: DashboardChartsProps) {
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
         }}>
           <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>
-            Tren Suhu & Berat (10 Operasi Terakhir)
+            Tren Suhu & Berat (20 Operasi Terakhir)
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={trendData}>
