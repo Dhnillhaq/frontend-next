@@ -36,44 +36,63 @@ export default function EditProductionLineForm({ productionLine }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
-      <div
-        style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}
-      >
-        <input
-          type="text"
-          placeholder="Line Code"
-          value={lineCode}
-          onChange={(e) => setLineCode(e.target.value)}
-          required
+    <div>
+      {/* Status Badge */}
+      <div style={{ marginBottom: 16 }}>
+        <span
           style={{
-            flex: 1,
-            minWidth: 150,
-          }}
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            whiteSpace: "nowrap",
+            display: "inline-block",
+            padding: "0.5rem 1rem",
+            borderRadius: "0.375rem",
+            fontSize: "0.875rem",
+            fontWeight: "600",
+            backgroundColor: productionLine.isActive ? "#22c55e" : "#6b7280",
+            color: "white",
           }}
         >
-          {loading ? "Updating..." : "Update"}
-        </button>
-        <button
-          type="button"
-          onClick={() => router.push("/production-lines")}
-          style={{
-            whiteSpace: "nowrap",
-          }}
-        >
-          Batal
-        </button>
+          Status: {productionLine.isActive ? "Aktif" : "Nonaktif"}
+        </span>
       </div>
 
-      {error && (
-        <p style={{ color: "#f97373", fontSize: "0.85rem" }}>{error}</p>
-      )}
-    </form>
+      <form onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
+        <div
+          style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}
+        >
+          <input
+            type="text"
+            placeholder="Line Code"
+            value={lineCode}
+            onChange={(e) => setLineCode(e.target.value)}
+            required
+            style={{
+              flex: 1,
+              minWidth: 150,
+            }}
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              whiteSpace: "nowrap",
+            }}
+          >
+            {loading ? "Updating..." : "Update"}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/production-lines")}
+            style={{
+              whiteSpace: "nowrap",
+            }}
+          >
+            Batal
+          </button>
+        </div>
+
+        {error && (
+          <p style={{ color: "#f97373", fontSize: "0.85rem" }}>{error}</p>
+        )}
+      </form>
+    </div>
   );
 }
