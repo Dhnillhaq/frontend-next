@@ -87,9 +87,9 @@ export default function OperationsTableClient({ initialOperations }: Props) {
               <tr key={`operation-${op.id}`} style={{ opacity: op.isActive ? 1 : 0.6 }}>
               <td>{index + 1}</td>
               <td>{formatDate(op.operationDate)}</td>
-              <td>{op.group.name}</td>
-              <td>Shift {op.shift.shiftNumber}</td>
-              <td>{op.productionLine.lineCode}</td>
+              <td>{op.group?.name || '-'}</td>
+              <td>Shift {op.shift?.shiftNumber || '-'}</td>
+              <td>{op.productionLine?.lineCode || '-'}</td>
               <td style={{ textAlign: "right" }}>{op.temperature}</td>
               <td style={{ textAlign: "right" }}>{op.weight}</td>
               <td style={{textAlign: "center"}}>
