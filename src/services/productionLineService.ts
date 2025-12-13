@@ -46,12 +46,16 @@ export async function updateProductionLine(
   return res.json();
 }
 
-export async function deleteProductionLine(id: number): Promise<void> {
-  const res = await fetch(`${BASE_URL}/production-lines/${id}`, {
-    method: "DELETE",
+export async function toggleProductionLineStatus(id: number, isActive: boolean): Promise<ProductionLine> {
+  const res = await fetch(`${BASE_URL}/production-lines/${id}/toggle-status`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ isActive }),
   });
 
   if (!res.ok) {
-    throw new Error("Failed to delete production line");
+    throw new Error("Failed to update production line status");
   }
+
+  return res.json();
 }

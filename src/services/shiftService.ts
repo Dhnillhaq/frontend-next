@@ -46,12 +46,16 @@ export async function updateShift(
   return res.json();
 }
 
-export async function deleteShift(id: number): Promise<void> {
-  const res = await fetch(`${BASE_URL}/shifts/${id}`, {
-    method: "DELETE",
+export async function toggleShiftStatus(id: number, isActive: boolean): Promise<Shift> {
+  const res = await fetch(`${BASE_URL}/shifts/${id}/toggle-status`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ isActive }),
   });
 
   if (!res.ok) {
-    throw new Error("Failed to delete shift");
+    throw new Error("Failed to update shift status");
   }
+
+  return res.json();
 }

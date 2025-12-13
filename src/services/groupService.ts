@@ -46,12 +46,16 @@ export async function updateGroup(
   return res.json();
 }
 
-export async function deleteGroup(id: number): Promise<void> {
-  const res = await fetch(`${BASE_URL}/groups/${id}`, {
-    method: "DELETE",
+export async function toggleGroupStatus(id: number, isActive: boolean): Promise<Group> {
+  const res = await fetch(`${BASE_URL}/groups/${id}/toggle-status`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ isActive }),
   });
 
   if (!res.ok) {
-    throw new Error("Failed to delete user");
+    throw new Error("Failed to update group status");
   }
+
+  return res.json();
 }
