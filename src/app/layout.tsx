@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Greenfields Production",
-  description: "Sistem Manajemen Produksi Greenfields KEREN",
+  description: "Sistem Manajemen Produksi Greenfields",
 };
 
 export default function RootLayout({
