@@ -24,7 +24,8 @@ jobs:
 
       - name: Push env vars to Vercel
         run: |
-          echo "${{ secrets.NEXT_PUBLIC_API_URL }}" | vercel env add NEXT_PUBLIC_API_URL production --token=${{ secrets.VERCEL_TOKEN }} --force
+          echo "${{ secrets.NEXT_PUBLIC_API_URL }}" | vercel env rm NEXT_PUBLIC_API_URL production --yes --token=${{ secrets.VERCEL_TOKEN }} 2>/dev/null || true
+          echo "${{ secrets.NEXT_PUBLIC_API_URL }}" | vercel env add NEXT_PUBLIC_API_URL production --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
