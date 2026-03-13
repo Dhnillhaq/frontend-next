@@ -12,13 +12,28 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Push env vars to Vercel
+      - name: Update env var via Vercel API
         run: |
-          echo "${{ secrets.NEXT_PUBLIC_API_URL }}" | vercel env rm NEXT_PUBLIC_API_URL production --yes --token=${{ secrets.VERCEL_TOKEN }} 2>/dev/null || true
-          echo "${{ secrets.NEXT_PUBLIC_API_URL }}" | vercel env add NEXT_PUBLIC_API_URL production --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          # Hapus env lama
+          ENV_ID=$(curl -s "https://api.vercel.com/v9/projects/${{ secrets.VERCEL_PROJECT_ID }}/env" \
+            -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+            | jq -r '.envs[] | select(.key=="NEXT_PUBLIC_API_URL" and .target[]=="production") | .id')
+          
+          if [ -n "$ENV_ID" ]; then
+            curl -s -X DELETE "https://api.vercel.com/v9/projects/${{ secrets.VERCEL_PROJECT_ID }}/env/$ENV_ID" \
+              -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}"
+          fi
 
-      - name: Trigger Vercel Deploy Hook
+          # Tambah env baru
+          curl -s -X POST "https://api.vercel.com/v9/projects/${{ secrets.VERCEL_PROJECT_ID }}/env" \
+            -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "key": "NEXT_PUBLIC_API_URL",
+              "value": "${{ secrets.NEXT_PUBLIC_API_URL }}",
+              "type": "plain",
+              "target": ["production"]
+            }'
+
+      - name: Trigger Deploy Hook
         run: curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"
